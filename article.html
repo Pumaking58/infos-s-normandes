@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <title>Article complet</title>
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <header>
+    <h1>Le Blog d'Enzo</h1>
+    <nav>
+      <a href="index.html">Accueil</a>
+    </nav>
+  </header>
+  <main>
+    <div id="article-container"></div>
+    <button onclick="modifierArticle()">✏️ Modifier</button>
+    <button onclick="supprimerArticle()">🗑 Supprimer</button>
+  </main>
+  <footer>&copy; 2025 Enzo Regelbrugge</footer>
+  <script>
+    const params = new URLSearchParams(window.location.search);
+    const id = parseInt(params.get("id"));
+    const articles = JSON.parse(localStorage.getItem("articles") || "[]");
+    const article = articles[id];
+    const container = document.getElementById("article-container");
+
+    if (article) {
+      container.innerHTML = `
+        <h2>${article.titre}</h2>
+        <p><em>${article.date} - ${article.categorie}</em></p>
+        ${article.image ? `<img src="${article.image}" style="max-width:100%;">` : ""}
+        <div>${article.contenu}</div>
+      `;
+    } else {
+      container.innerHTML = "<p>Article introuvable.</p>";
+    }
+
+    function supprimerArticle() {
+      if (!confirm("Voulez-vous vraiment supprimer cet article ?")) return;
+      articles.splice(id, 1);
+      localStorage.setItem("articles", JSON.stringify(articles));
+      alert("Article supprimé.");
+      window.location.href = "index.html";
+    }
+
+    function modifierArticle() {
+      window.location.href = `modifier.html?id=${id}`;
+    }
+  </script>
+</body>
+</html>

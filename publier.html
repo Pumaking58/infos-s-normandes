@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <title>Publier un article</title>
+  <link rel="stylesheet" href="https://cdn.quilljs.com/1.3.6/quill.snow.css" />
+  <link rel="stylesheet" href="css/style.css" />
+  <style>
+    #editor { height: 300px; background: #fff; margin-bottom: 20px; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Publier un article</h1>
+    <nav>
+      <a href="index.html">Accueil</a>
+      <a href="apropos.html">À propos</a>
+      <a href="contact.html">Contact</a>
+    </nav>
+  </header>
+  <main>
+    <div id="login">
+      <h2>Connexion</h2>
+      <input type="text" id="username" placeholder="Identifiant" />
+      <input type="password" id="password" placeholder="Mot de passe" />
+      <button onclick="auth()">Se connecter</button>
+    </div>
+
+    <div id="editor-section" style="display:none;">
+      <input type="text" id="titre" placeholder="Titre de l'article" />
+      <select id="categorie">
+        <option value="">Catégorie</option>
+        <option value="Actualité">Actualité</option>
+        <option value="Sport">Sport</option>
+        <option value="Culture">Culture</option>
+        <option value="Opinion">Opinion</option>
+      </select>
+
+      <div id="toolbar-container"></div>
+      <div id="editor"></div>
+
+      <input type="file" id="image" accept="image/*" />
+      <button onclick="publier()">Publier</button>
+    </div>
+  </main>
+
+  <footer>&copy; 2025 Enzo Regelbrugge</footer>
+
+  <!-- Quill JS -->
+  <script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
+  <script>
+    let quill;
+
+    function auth() {
+      const user = document.getElementById("username").value;
+      const pass = document.getElementById("password").value;
+      if (user === "eregelbrugge" && pass === "30062006") {
+        document.getElementById("login").style.display = "none";
+        document.getElementById("editor-section").style.display = "block";
+        initEditor();
+      } else {
+        alert("Identifiants incorrects.");
+      }
+    }
+
+    function initEditor() {
+      quill = new Quill('#editor', {
+        theme: 'snow',
+        placeholder: 'Écris ton article ici...',
+        modules: {
+          toolbar: [
+            [{ font: [] }, { size: [] }],
+            ['bold', 'italic', 'underline', 'strike'],
+            [{ color: [] }, { background: [] }],
+            [{ script: 'sub' }, { script: 'super' }],
+            [{ header: [1, 2, 3, 4, 5, false] }],
+            [{ list: 'ordered' }, { list: 'bullet' }],
+            [{ align: [] }],
+            ['link', 'clean']
+          ]
+        }
+      });
+    }
+
+    function publier() {
+      const titre = document.getElementById("titre").value;
+      const categorie = document.getElementById("categorie").value;
+      const contenu = quill.root.innerHTML;
+      const date = new Date().toLocaleDateString("fr-FR");
+      const file = document.getElementById("image").files[0];
+      const article = { titre, contenu, categorie, date };
+
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = () => {
+          article.image = reader.result;
+          enregistrer(article);
+        };
+        reader.readAsDataURL(file);
+      } else {
+        enregistrer(article);
+      }
+    }
+
+    function enregistrer(article) {
+      const articles = JSON.parse(localStorage.getItem("articles") || "[]");
+      articles.push(article);
+      localStorage.setItem("articles", JSON.stringify(articles));
+      alert("Article publié !");
+      window.location.href = "index.html";
+    }
+  </script>
+</body>
+</html>
